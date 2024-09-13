@@ -167,11 +167,18 @@ if __name__ == '__main__':
     # sasamura = MyTeam('パンダ', ['多井隆晴', '黒沢咲', '村上淳', '内川幸太郎'])
 
     # 2023 レギュラーシーズン
-    hashimoto = MyTeam('hsmt', ['佐々木寿人', '多井隆晴', '仲林圭', '鈴木優', '浅見真紀'])
-    rachi = MyTeam('東豚', ['猿川真寿', '松ヶ瀬隆弥', '松本吉弘', '渡辺太', '魚谷侑未'])
-    umeda = MyTeam('UMD', ['伊達朱里紗', '小林剛', '堀慎吾', '鈴木大介', '白鳥翔'])
-    sasamura = MyTeam('パンダ', ['園田賢', '勝又健志', '内川幸太郎', '瑞原明奈','黒沢咲'])
-    daisu = MyTeam('ダイス', ['菅原千瑛', '岡田紗佳', '中田花奈', '鈴木たろう', '高宮まり'])
+    # hashimoto = MyTeam('hsmt', ['佐々木寿人', '多井隆晴', '仲林圭', '鈴木優', '浅見真紀'])
+    # rachi = MyTeam('東豚', ['猿川真寿', '松ヶ瀬隆弥', '松本吉弘', '渡辺太', '魚谷侑未'])
+    # umeda = MyTeam('UMD', ['伊達朱里紗', '小林剛', '堀慎吾', '鈴木大介', '白鳥翔'])
+    # sasamura = MyTeam('パンダ', ['園田賢', '勝又健志', '内川幸太郎', '瑞原明奈','黒沢咲'])
+    # daisu = MyTeam('ダイス', ['菅原千瑛', '岡田紗佳', '中田花奈', '鈴木たろう', '高宮まり'])
+
+    # 2024 レギュラーシーズン
+    hashimoto = MyTeam('hsmt', ['仲林圭', '竹内元太', '浅井堂岐', '浅見真紀'])
+    rachi = MyTeam('東豚', ['松本吉弘', '佐々木寿人', '松ヶ瀬隆弥', '日向藍子'])
+    umeda = MyTeam('UMD', ['堀慎吾', '伊達朱里紗', '多井隆晴', '鈴木優'])
+    daisu1 = MyTeam('ダイス１', ['二階堂瑠美', '鈴木大介', '菅原千瑛', '中田花奈'])
+    daisu2 = MyTeam('ダイス２', ['内川幸太郎', '高宮まり', '本田朋広', '白鳥翔'])
 
     dal = DataAnalysis()
-    print(dal.make_team_score([hashimoto, rachi, umeda, sasamura, daisu]))
+    print(dal.make_team_score([hashimoto, rachi, umeda, daisu1, daisu2]))
