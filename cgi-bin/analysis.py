@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import requests
 import os
 import sys
+import re
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -33,19 +34,18 @@ class DataAnalysis:
         self.soup = BeautifulSoup(res.content, "html.parser")
 
         self.player_score_map = None
+        self.player_rank_map = None
         self.team_score_map = None
+        self.team_rank_map = None
 
     @property
     def make_player_score(self):
         """
         各選手の集計結果を作成する
-
-        Returns
-        -------
-        player_score_map　:　dict
-            ゲームごとの全選手の集計データ（key：game_count、value：（key：player_name、value：score））
-
         """
+        # プレイヤーごとの順位データ（key：player_name、value：順位配列[1着回数, 2着回数, 3着回数, 4着回数]）
+        player_rank_map = {}
+
         # トータルスコア（key：player_name、value：score）
         sum_score_map = {}
 
@@ -69,6 +69,7 @@ class DataAnalysis:
             game_count += 1
             result_column = one_day_result.find_all(class_="p-gamesResult__rank-item")
             for one_result in result_column:
+                # 名前取得
                 player_name = one_result.find(class_="p-gamesResult__name").text.strip()
                 # row_score 例: ▲53.3pt
                 row_score = one_result.find(class_="p-gamesResult__point").text.strip()
@@ -83,11 +84,17 @@ class DataAnalysis:
                     # score_map作成 小数点の誤差が発生するため、四捨五入を行う
                 sum_score_map[player_name] = round(sum_score_map.get(player_name, 0.0) + float(player_score), 1)
 
+                # 順位取得&設定
+                player_rank = eval(one_result.find(class_=re.compile("^p-gamesResult__rank-badge")).text.strip())
+                if not player_name in player_rank_map:
+                    player_rank_map[player_name] = [0 ,0, 0, 0]
+                player_rank_map[player_name][player_rank - 1] = player_rank_map[player_name][player_rank - 1] + 1
+
             # game_countごとの結果を保管
             player_score_map[game_count] = sum_score_map.copy()
 
         self.player_score_map = player_score_map
-        return player_score_map
+        self.player_rank_map = player_rank_map
 
     def make_team_score(self, team_list):
         """
@@ -97,20 +104,25 @@ class DataAnalysis:
         team_list : list
             チームクラスのリスト
 
-        Returns
-        -------
-        team_score_map : dict
-            ゲームごとの全チームの集計データ（key：game_conut、value：(key:team_name ,value:point)）
-
         """
         if self.player_score_map is None:
             self.make_player_score
 
-        # 全チームのデータ（key：game_conut、value：(key:team_name ,value:point)）
+        # 全チームの点数データ(key：game_conut、value：(key:team_name ,value:point))
         team_score_map = {0: {}}
-        # 初期値0.0の配置
+        # 全チームの順位データ(key：team_name、value：順位配列[1着回数, 2着回数, 3着回数, 4着回数])
+        team_rank_map = {}
+
         for team in team_list:
+            # 初期値0.0の配置
             team_score_map[0][team.team_name] = 0.0
+
+            # チームごとの順位集計
+            team_rank_map[team.team_name] = [0, 0, 0, 0]
+            for mem in team.member:
+                # 個人の順位をチームごとの集計に集約
+                if mem in self.player_rank_map:
+                    team_rank_map[team.team_name] = [x + y for (x, y) in zip(team_rank_map[team.team_name], self.player_rank_map[mem])]
 
         # game_countごとの集計
         for game_count, sum_score_map in self.player_score_map.items():
@@ -128,7 +140,7 @@ class DataAnalysis:
                             team.member_score[mem] = sum_score_map[score_key]
                     team_score_map[game_count][team.team_name] = team.total_score
         self.team_score_map = team_score_map
-        return team_score_map
+        self.team_rank_map = team_rank_map
 
 
 if __name__ == '__main__':
@@ -181,4 +193,7 @@ if __name__ == '__main__':
     daisu2 = MyTeam('ダイス２', ['内川幸太郎', '高宮まり', '本田朋広', '白鳥翔'])
 
     dal = DataAnalysis()
-    print(dal.make_team_score([hashimoto, rachi, umeda, daisu1, daisu2]))
+    dal.make_team_score([hashimoto, rachi, umeda, daisu1, daisu2])
+    #print(dal.player_score_map)
+    print(dal.player_rank_map)
+    print(dal.team_rank_map)

@@ -42,12 +42,32 @@ td,th{
         <td>{{team.team_name}}</td>
         <td><b>{{team.total_score}}</b></td>
         {% for member, score in team.member_score.items() %}
-        <td>{{member}} : {{score}}</td>
+            <td>{{member}} : {{score}}</td>
         {% endfor %}
     </tr>
     {% endfor %}
 </table>
 <canvas id="myLineChart"></canvas>
+<table>
+    <tr>
+        <th>rank</th>
+        <th>name</th>
+        <th>1着</th>
+        <th>2着</th>
+        <th>3着</th>
+        <th>4着</th>
+    </tr>
+    {% for team in team_list %}
+    <tr>
+        <td>{{loop.index}}</td>
+        <td>{{team.team_name}}</td>
+        {% for iCnt in range(4) %}
+            <td>{{team_rank_map[team.team_name][iCnt]}}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
 <script type="text/javascript" src="js/Chart.bundle.js"></script>
 <script type="text/javascript" src="js/chartjs-plugin-colorschemes.js"></script>
 
