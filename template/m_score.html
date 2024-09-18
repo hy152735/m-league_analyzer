@@ -56,6 +56,8 @@ td,th{
         <th>2着</th>
         <th>3着</th>
         <th>4着</th>
+        <th>最大得点</th>
+        <th>最小得点</th>
     </tr>
     {% for team in team_list %}
     <tr>
@@ -64,6 +66,15 @@ td,th{
         {% for iCnt in range(4) %}
             <td>{{team_rank_map[team.team_name][iCnt]}}</td>
         {% endfor %}
+
+        {% if team.team_name in team_maxmin_map %}
+            {% set team_maxmin= team_maxmin_map[team.team_name] %}
+            <td>{{team_maxmin[0]}} {{team_maxmin[1]}} : {{team_maxmin[2]}}</td>
+            <td>{{team_maxmin[3]}} {{team_maxmin[4]}} : {{team_maxmin[5]}}</td>
+        {% else %}
+            <td></td>
+            <td></td>
+        {% endif %}
     </tr>
     {% endfor %}
 </table>

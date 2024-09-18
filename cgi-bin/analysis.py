@@ -35,8 +35,10 @@ class DataAnalysis:
 
         self.player_score_map = None
         self.player_rank_map = None
+        self.player_maxmin_map = None
         self.team_score_map = None
         self.team_rank_map = None
+        self.team_maxmin_map = None
 
     @property
     def make_player_score(self):
@@ -45,12 +47,12 @@ class DataAnalysis:
         """
         # プレイヤーごとの順位データ（key：player_name、value：順位配列[1着回数, 2着回数, 3着回数, 4着回数]）
         player_rank_map = {}
-
         # トータルスコア（key：player_name、value：score）
         sum_score_map = {}
-
         # 日ごとトータルスコア（key：game_count、value：sum_score_map）
         player_score_map = {}
+        # プレイヤーごとの最大・最小データ（key：player_name、value：配列[max_date, max_score, min_date, min_score]]）
+        player_maxmin_map = {}
 
         games_result = self.soup.find_all(class_="p-gamesResult")
         game_count = 0
@@ -59,7 +61,7 @@ class DataAnalysis:
             if game_day == '/日(曜日)':
                 continue
 
-            # # セミファイルナル仕様（3/16以降まで飛ばす）
+            # # セミファイナル仕様（3/16以降まで飛ばす）
             # game_only_day = game_day.split('(')[0].split('/')
             # if int(game_only_day[0]) != 3:
             #     continue
@@ -81,8 +83,19 @@ class DataAnalysis:
                     # 65.5-20 = 45.5
                     player_score = eval(player_score)
 
-                    # score_map作成 小数点の誤差が発生するため、四捨五入を行う
+                # score_map作成 小数点の誤差が発生するため、四捨五入を行う
                 sum_score_map[player_name] = round(sum_score_map.get(player_name, 0.0) + float(player_score), 1)
+                
+                # 個人ごとの最大・最小判定
+                if not player_name in player_maxmin_map:
+                    player_maxmin_map[player_name] = [game_day, float(player_score), game_day, float(player_score)]
+                else:
+                    if float(player_score) > player_maxmin_map[player_name][1]:
+                        player_maxmin_map[player_name][0] = game_day
+                        player_maxmin_map[player_name][1] = float(player_score)
+                    elif float(player_score) < player_maxmin_map[player_name][3]:
+                        player_maxmin_map[player_name][2] = game_day
+                        player_maxmin_map[player_name][3] = float(player_score)           
 
                 # 順位取得&設定
                 player_rank = eval(one_result.find(class_=re.compile("^p-gamesResult__rank-badge")).text.strip())
@@ -95,6 +108,7 @@ class DataAnalysis:
 
         self.player_score_map = player_score_map
         self.player_rank_map = player_rank_map
+        self.player_maxmin_map = player_maxmin_map
 
     def make_team_score(self, team_list):
         """
@@ -112,6 +126,8 @@ class DataAnalysis:
         team_score_map = {0: {}}
         # 全チームの順位データ(key：team_name、value：順位配列[1着回数, 2着回数, 3着回数, 4着回数])
         team_rank_map = {}
+        # チームごとの最大・最小データ（key：team_name、value：配列[max_date, member, max_score, min_date, member, min_score]]）
+        team_maxmin_map = {}
 
         for team in team_list:
             # 初期値0.0の配置
@@ -123,6 +139,21 @@ class DataAnalysis:
                 # 個人の順位をチームごとの集計に集約
                 if mem in self.player_rank_map:
                     team_rank_map[team.team_name] = [x + y for (x, y) in zip(team_rank_map[team.team_name], self.player_rank_map[mem])]
+                # チームごとの最大・最小データを設定
+                if mem in self.player_maxmin_map:
+                    if not team.team_name in team_maxmin_map:
+                        team_maxmin_map[team.team_name] = self.player_maxmin_map[mem]
+                        team_maxmin_map[team.team_name].insert(1, mem) 
+                        team_maxmin_map[team.team_name].insert(4, mem) 
+                    else:
+                        if self.player_maxmin_map[mem][1] > team_maxmin_map[team.team_name][2]:
+                            team_maxmin_map[team.team_name][0] = self.player_maxmin_map[mem][0] #日付
+                            team_maxmin_map[team.team_name][1] = mem #メンバー
+                            team_maxmin_map[team.team_name][2] = self.player_maxmin_map[mem][1] #スコア
+                        if self.player_maxmin_map[mem][3] < team_maxmin_map[team.team_name][5]:
+                            team_maxmin_map[team.team_name][3] = self.player_maxmin_map[mem][2]
+                            team_maxmin_map[team.team_name][4] = mem
+                            team_maxmin_map[team.team_name][5] = self.player_maxmin_map[mem][3]
 
         # game_countごとの集計
         for game_count, sum_score_map in self.player_score_map.items():
@@ -141,6 +172,7 @@ class DataAnalysis:
                     team_score_map[game_count][team.team_name] = team.total_score
         self.team_score_map = team_score_map
         self.team_rank_map = team_rank_map
+        self.team_maxmin_map = team_maxmin_map
 
 
 if __name__ == '__main__':
@@ -195,5 +227,8 @@ if __name__ == '__main__':
     dal = DataAnalysis()
     dal.make_team_score([hashimoto, rachi, umeda, daisu1, daisu2])
     #print(dal.player_score_map)
-    print(dal.player_rank_map)
-    print(dal.team_rank_map)
+    #print(dal.player_rank_map)
+    print(dal.player_maxmin_map)
+    #print(dal.team_score_map)
+    #print(dal.team_rank_map)
+    print(dal.team_maxmin_map)

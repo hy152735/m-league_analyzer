@@ -89,7 +89,7 @@ def application(environ, start_response):
         team_list = sorted(team_list, key=lambda t: t.total_score, reverse=True)
 
         template = jinja2_env.get_template('m_score.html')
-        html = template.render(team_list=team_list, team_score_map=dal.team_score_map, team_rank_map=dal.team_rank_map)
+        html = template.render(team_list=team_list, team_score_map=dal.team_score_map, team_rank_map=dal.team_rank_map, team_maxmin_map=dal.team_maxmin_map)
     else:
         # 初期画面
         template = jinja2_env.get_template('index.html')
