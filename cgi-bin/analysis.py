@@ -20,7 +20,7 @@ class MyTeam:
         self.member = member
         self.total_score = 0.0
         self.member_score = {}
-
+        self.soten_score = 0.0
 
 class DataAnalysis:
     def __init__(self):
@@ -51,7 +51,7 @@ class DataAnalysis:
         sum_score_map = {}
         # 日ごとトータルスコア（key：game_count、value：sum_score_map）
         player_score_map = {}
-        # プレイヤーごとの最大・最小データ（key：player_name、value：配列[max_date, max_score, min_date, min_score]]）
+        # プレイヤーごとの最高・最低データ（key：player_name、value：配列[max_date, max_score, min_date, min_score]]）
         player_maxmin_map = {}
 
         games_result = self.soup.find_all(class_="p-gamesResult")
@@ -122,11 +122,13 @@ class DataAnalysis:
         if self.player_score_map is None:
             self.make_player_score
 
+        # 素点定義（例：1着だと順位点30,オカ15が入っているのでその分を引く）
+        SOTEN_DEF = {0:-45.0, 1:-5.0, 2:15.0, 3:35.0}
         # 全チームの点数データ(key：game_conut、value：(key:team_name ,value:point))
         team_score_map = {0: {}}
         # 全チームの順位データ(key：team_name、value：順位配列[1着回数, 2着回数, 3着回数, 4着回数])
         team_rank_map = {}
-        # チームごとの最大・最小データ（key：team_name、value：配列[max_date, member, max_score, min_date, member, min_score]]）
+        # チームごとの最高・最低データ（key：team_name、value：配列[max_date, member, max_score, min_date, member, min_score]]）
         team_maxmin_map = {}
 
         for team in team_list:
@@ -139,7 +141,7 @@ class DataAnalysis:
                 # 個人の順位をチームごとの集計に集約
                 if mem in self.player_rank_map:
                     team_rank_map[team.team_name] = [x + y for (x, y) in zip(team_rank_map[team.team_name], self.player_rank_map[mem])]
-                # チームごとの最大・最小データを設定
+                # チームごとの最高・最低データを設定
                 if mem in self.player_maxmin_map:
                     if not team.team_name in team_maxmin_map:
                         team_maxmin_map[team.team_name] = self.player_maxmin_map[mem]
@@ -154,7 +156,7 @@ class DataAnalysis:
                             team_maxmin_map[team.team_name][3] = self.player_maxmin_map[mem][2]
                             team_maxmin_map[team.team_name][4] = mem
                             team_maxmin_map[team.team_name][5] = self.player_maxmin_map[mem][3]
-
+            
         # game_countごとの集計
         for game_count, sum_score_map in self.player_score_map.items():
             # 初期化
@@ -170,10 +172,16 @@ class DataAnalysis:
                             team.total_score = round(team.total_score + sum_score_map[score_key], 1)
                             team.member_score[mem] = sum_score_map[score_key]
                     team_score_map[game_count][team.team_name] = team.total_score
+
+        # 素点計算
+        for team in team_list:
+            team.soten_score = team.total_score
+            for index, rank_count in enumerate(team_rank_map[team.team_name]):
+                team.soten_score = round(team.soten_score + SOTEN_DEF[index] * rank_count, 1)
+
         self.team_score_map = team_score_map
         self.team_rank_map = team_rank_map
         self.team_maxmin_map = team_maxmin_map
-
 
 if __name__ == '__main__':
     # 2019 予選メンバー
@@ -228,7 +236,7 @@ if __name__ == '__main__':
     dal.make_team_score([hashimoto, rachi, umeda, daisu1, daisu2])
     #print(dal.player_score_map)
     #print(dal.player_rank_map)
-    print(dal.player_maxmin_map)
+    #print(dal.player_maxmin_map)
     #print(dal.team_score_map)
-    #print(dal.team_rank_map)
-    print(dal.team_maxmin_map)
+    print(dal.team_rank_map)
+    #print(dal.team_maxmin_map)
