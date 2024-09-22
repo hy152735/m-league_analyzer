@@ -45,13 +45,15 @@ class DataAnalysis:
         """
         各選手の集計結果を作成する
         """
+        # 順位点定義（例：1着だと順位点30＋オカ20が入っているのでその分を引く）
+        RANK_DEF = {0:50.0, 1:10.0, 2:-10.0, 3:-30.0}
         # プレイヤーごとの順位データ（key：player_name、value：順位配列[1着回数, 2着回数, 3着回数, 4着回数]）
         player_rank_map = {}
         # トータルスコア（key：player_name、value：score）
         sum_score_map = {}
         # 日ごとトータルスコア（key：game_count、value：sum_score_map）
         player_score_map = {}
-        # プレイヤーごとの最高・最低データ（key：player_name、value：配列[max_date, max_score, min_date, min_score]]）
+        # プレイヤーごとの最高・最低データ（key：player_name、value：配列[max_date, max_tensu, min_date, min_tensu]]）
         player_maxmin_map = {}
 
         games_result = self.soup.find_all(class_="p-gamesResult")
@@ -82,26 +84,28 @@ class DataAnalysis:
                     player_score = player_score.replace('(', '').replace(')', '')
                     # 65.5-20 = 45.5
                     player_score = eval(player_score)
+                player_score = float(player_score)
 
                 # score_map作成 小数点の誤差が発生するため、四捨五入を行う
-                sum_score_map[player_name] = round(sum_score_map.get(player_name, 0.0) + float(player_score), 1)
-                
-                # 個人ごとの最大・最小判定
-                if not player_name in player_maxmin_map:
-                    player_maxmin_map[player_name] = [game_day, float(player_score), game_day, float(player_score)]
-                else:
-                    if float(player_score) > player_maxmin_map[player_name][1]:
-                        player_maxmin_map[player_name][0] = game_day
-                        player_maxmin_map[player_name][1] = float(player_score)
-                    elif float(player_score) < player_maxmin_map[player_name][3]:
-                        player_maxmin_map[player_name][2] = game_day
-                        player_maxmin_map[player_name][3] = float(player_score)           
-
+                sum_score_map[player_name] = round(sum_score_map.get(player_name, 0.0) + player_score, 1)
+                      
                 # 順位取得&設定
                 player_rank = eval(one_result.find(class_=re.compile("^p-gamesResult__rank-badge")).text.strip())
                 if not player_name in player_rank_map:
                     player_rank_map[player_name] = [0 ,0, 0, 0]
                 player_rank_map[player_name][player_rank - 1] = player_rank_map[player_name][player_rank - 1] + 1
+
+                # 個人ごとの点数最大・最小判定
+                player_tensu = int(round((player_score + 30.0 - RANK_DEF[player_rank - 1]) * 1000, 1)) # scoreから点数を復元
+                if not player_name in player_maxmin_map:
+                    player_maxmin_map[player_name] = [game_day, player_tensu, game_day, player_tensu]
+                else:
+                    if player_tensu > player_maxmin_map[player_name][1]:
+                        player_maxmin_map[player_name][0] = game_day
+                        player_maxmin_map[player_name][1] = player_tensu
+                    elif player_tensu < player_maxmin_map[player_name][3]:
+                        player_maxmin_map[player_name][2] = game_day
+                        player_maxmin_map[player_name][3] = player_tensu
 
             # game_countごとの結果を保管
             player_score_map[game_count] = sum_score_map.copy()
@@ -239,4 +243,4 @@ if __name__ == '__main__':
     #print(dal.player_maxmin_map)
     #print(dal.team_score_map)
     print(dal.team_rank_map)
-    #print(dal.team_maxmin_map)
+    print(dal.team_maxmin_map)
