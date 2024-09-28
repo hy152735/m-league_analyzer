@@ -82,6 +82,8 @@ class DataAnalysis:
                 # 2022/01/11 チョンボ対応　チョンボの時は65.5(-20)となるので、括弧を外して加算する
                 if ('(' in player_score):
                     player_score = player_score.replace('(', '').replace(')', '')
+                    # 2024/09/28 チョンボ対応改修　チョンボの時に 5.2 (錯和-20)となるので、間に挟まっている日本語を削除するように改修
+                    player_score = re.sub(r'[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]', "", player_score)
                     # 65.5-20 = 45.5
                     player_score = eval(player_score)
                 player_score = float(player_score)
@@ -182,6 +184,9 @@ class DataAnalysis:
             team.soten_score = team.total_score
             for index, rank_count in enumerate(team_rank_map[team.team_name]):
                 team.soten_score = round(team.soten_score + SOTEN_DEF[index] * rank_count, 1)
+            # チーム内のスコア順に並び変え
+            team.member_score = sorted(team.member_score.items(), key=lambda t: t[1], reverse=True)
+            team.member_score = dict((x, y) for x, y in team.member_score)
 
         self.team_score_map = team_score_map
         self.team_rank_map = team_rank_map
@@ -242,5 +247,5 @@ if __name__ == '__main__':
     #print(dal.player_rank_map)
     #print(dal.player_maxmin_map)
     #print(dal.team_score_map)
-    print(dal.team_rank_map)
-    print(dal.team_maxmin_map)
+    #print(dal.team_rank_map)
+    #print(dal.team_maxmin_map)
