@@ -21,8 +21,8 @@ class MyTeam:
         self.total_score = 0.0
         self.member_score = {}
         self.soten_score = 0.0
-        self.oka_score = 0.0
-        self.jyuni_score = 0.0
+        self.oka_score = 0
+        self.jyuni_score = 0
 
 class DataAnalysis:
     def __init__(self):
@@ -131,9 +131,9 @@ class DataAnalysis:
             self.make_player_score
 
         # オカ定義
-        OKA_DEF = {0:15.0, 1:-5.0, 2:-5.0, 3:-5.0}
+        OKA_DEF = {0:15, 1:-5, 2:-5, 3:-5}
         # 順位点定義
-        JYUNI_DEF = {0:30.0, 1:10.0, 2:-10.0, 3:-30.0}
+        JYUNI_DEF = {0:30, 1:10, 2:-10, 3:-30}
 
         # 全チームの点数データ(key：game_conut、value：(key:team_name ,value:point))
         team_score_map = {0: {}}
@@ -189,8 +189,8 @@ class DataAnalysis:
             team.soten_score = team.total_score
             for index, rank_count in enumerate(team_rank_map[team.team_name]):
                 team.soten_score = round(team.soten_score - (OKA_DEF[index] + JYUNI_DEF[index]) * rank_count, 1)
-                team.oka_score = round(team.oka_score + OKA_DEF[index] * rank_count, 1)
-                team.jyuni_score = round(team.jyuni_score + JYUNI_DEF[index] * rank_count, 1)
+                team.oka_score += OKA_DEF[index] * rank_count
+                team.jyuni_score += JYUNI_DEF[index] * rank_count
             # チーム内のスコア順に並び変え
             team.member_score = sorted(team.member_score.items(), key=lambda t: t[1], reverse=True)
             team.member_score = dict((x, y) for x, y in team.member_score)
