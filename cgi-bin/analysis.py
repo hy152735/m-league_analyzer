@@ -48,7 +48,7 @@ class DataAnalysis:
         各選手の集計結果を作成する
         """
         # 順位点定義（例：1着だと順位点30＋オカ20が入っているのでその分を引く）
-        RANK_DEF = {0:50.0, 1:10.0, 2:-10.0, 3:-30.0}
+        RANK_DEF = {0:50.0, 0.5:30.0, 1:10.0, 1.5:0.0, 2:-10.0, 2.5:-20.0, 3:-30.0}
         # プレイヤーごとの順位データ（key：player_name、value：順位配列[1着回数, 2着回数, 3着回数, 4着回数]）
         player_rank_map = {}
         # トータルスコア（key：player_name、value：score）
@@ -73,6 +73,8 @@ class DataAnalysis:
             #     continue
 
             game_count += 1
+            pre_player_name = '' # 同点対策　前のプレイヤー名
+            pre_player_rank = 0 # 同点対策　前の順位
             result_column = one_day_result.find_all(class_="p-gamesResult__rank-item")
             for one_result in result_column:
                 # 名前取得
@@ -97,7 +99,17 @@ class DataAnalysis:
                 player_rank = eval(one_result.find(class_=re.compile("^p-gamesResult__rank-badge")).text.strip())
                 if not player_name in player_rank_map:
                     player_rank_map[player_name] = [0 ,0, 0, 0]
-                player_rank_map[player_name][player_rank - 1] = player_rank_map[player_name][player_rank - 1] + 1
+                # 2024/11/06 同点対策　同点の場合は同じ順位が2つになるので、前の順位と同じだったかどうかを判定する
+                if pre_player_rank == player_rank:
+                    # 前のプレイヤーの順位操作（1.5着だった場合は 1着：0.5、2着：0.5とする）
+                    player_rank_map[pre_player_name][player_rank - 1] -= 0.5
+                    player_rank_map[pre_player_name][player_rank] += 0.5
+                    # 今のプレイヤーの順位操作
+                    player_rank_map[player_name][player_rank - 1] += 0.5
+                    player_rank_map[player_name][player_rank] += 0.5
+                else:
+                    # 通常の場合
+                    player_rank_map[player_name][player_rank - 1] += 1
 
                 # 個人ごとの点数最大・最小判定
                 player_tensu = int(round((player_score + 30.0 - RANK_DEF[player_rank - 1]) * 1000, 1)) # scoreから点数を復元
@@ -110,6 +122,10 @@ class DataAnalysis:
                     elif player_tensu < player_maxmin_map[player_name][3]:
                         player_maxmin_map[player_name][2] = game_day
                         player_maxmin_map[player_name][3] = player_tensu
+                
+                # 次回ループ用
+                pre_player_name = player_name
+                pre_player_rank = player_rank
 
             # game_countごとの結果を保管
             player_score_map[game_count] = sum_score_map.copy()
@@ -256,3 +272,8 @@ if __name__ == '__main__':
     #print(dal.team_score_map)
     #print(dal.team_rank_map)
     #print(dal.team_maxmin_map)
+
+    #print(umeda.soten_score)
+    #print(umeda.oka_score)
+    #print(umeda.jyuni_score)
+
