@@ -72,16 +72,21 @@ def application(environ, start_response):
         # daisu = analysis.MyTeam('ダイス', ['菅原千瑛', '岡田紗佳', '中田花奈', '鈴木たろう', '高宮まり'])
 
         # 2024 レギュラーシーズン
-        hashimoto = analysis.MyTeam('hsmt', ['仲林圭', '竹内元太', '浅井堂岐', '浅見真紀'])
-        rachi = analysis.MyTeam('東豚', ['松本吉弘', '佐々木寿人', '松ヶ瀬隆弥', '日向藍子'])
-        umeda = analysis.MyTeam('UMD', ['堀慎吾', '伊達朱里紗', '多井隆晴', '鈴木優'])
-        daisu1 = analysis.MyTeam('ダイス１', ['二階堂瑠美', '鈴木大介', '菅原千瑛', '中田花奈'])
-        daisu2 = analysis.MyTeam('ダイス２', ['内川幸太郎', '高宮まり', '本田朋広', '白鳥翔'])
+        # hashimoto = analysis.MyTeam('hsmt', ['仲林圭', '竹内元太', '浅井堂岐', '浅見真紀'])
+        # rachi = analysis.MyTeam('東豚', ['松本吉弘', '佐々木寿人', '松ヶ瀬隆弥', '日向藍子'])
+        # umeda = analysis.MyTeam('UMD', ['堀慎吾', '伊達朱里紗', '多井隆晴', '鈴木優'])
+        # daisu1 = analysis.MyTeam('ダイス１', ['二階堂瑠美', '鈴木大介', '菅原千瑛', '中田花奈'])
+        # daisu2 = analysis.MyTeam('ダイス２', ['内川幸太郎', '高宮まり', '本田朋広', '白鳥翔'])
 
+        # 2024 セミファイナル        
+        hashimoto = analysis.MyTeam('hsmt', ['仲林圭', '渡辺太', '園田賢'])
+        rachi = analysis.MyTeam('東豚', ['松本吉弘', '日向藍子', '伊達朱里紗'])
+        umeda = analysis.MyTeam('UMD', ['佐々木寿人', '竹内元太', '鈴木優'])
+        daisu1 = analysis.MyTeam('ダイス１', ['醍醐大', '鈴木たろう', '小林剛'])
         #team_list = [hashimoto, rachi, umeda, sasamura, yosei]
         #team_list = [hashimoto, rachi, umeda, sasamura]
         #team_list = [hashimoto, rachi, umeda, sasamura, daisu]
-        team_list = [hashimoto, rachi, umeda, daisu1, daisu2]
+        team_list = [hashimoto, rachi, umeda, daisu1]
 
         dal = analysis.DataAnalysis()
         dal.make_team_score(team_list)
