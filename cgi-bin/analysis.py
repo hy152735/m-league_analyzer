@@ -210,8 +210,10 @@ class DataAnalysis:
             team.soten_score = team.total_score
             for index, rank_count in enumerate(team_rank_map[team.team_name]):
                 team.soten_score = round(team.soten_score - (OKA_DEF[index] + JYUNI_DEF[index]) * rank_count, 1)
-                team.oka_score += int(OKA_DEF[index] * rank_count)
+                team.oka_score += (OKA_DEF[index] * rank_count)
                 team.jyuni_score += int(JYUNI_DEF[index] * rank_count)
+            # オカの整数化（途中で実施すると 0.5のintでずれてしまうため）
+            team.oka_score = int(team.oka_score)
             # チーム内のスコア順に並び変え
             team.member_score = sorted(team.member_score.items(), key=lambda t: t[1], reverse=True)
             team.member_score = dict((x, y) for x, y in team.member_score)
@@ -285,7 +287,7 @@ if __name__ == '__main__':
     #print(dal.team_rank_map)
     #print(dal.team_maxmin_map)
 
-    print(umeda.soten_score)
-    print(umeda.oka_score)
-    print(umeda.jyuni_score)
+    print(hashimoto.soten_score)
+    print(hashimoto.oka_score)
+    print(hashimoto.jyuni_score)
 
