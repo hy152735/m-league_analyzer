@@ -273,14 +273,21 @@ if __name__ == '__main__':
     # daisu2 = MyTeam('ダイス２', ['内川幸太郎', '高宮まり', '本田朋広', '白鳥翔'])
 
     # 2024 セミファイナル
-    hashimoto = MyTeam('hsmt', ['仲林圭', '渡辺太', '園田賢'])
-    rachi = MyTeam('東豚', ['松本吉弘', '日向藍子', '伊達朱里紗'])
-    umeda = MyTeam('UMD', ['佐々木寿人', '竹内元太', '鈴木優'])
-    daisu1 = MyTeam('ダイス１', ['醍醐大', '鈴木たろう', '小林剛'])
+    # hashimoto = MyTeam('hsmt', ['仲林圭', '渡辺太', '園田賢'])
+    # rachi = MyTeam('東豚', ['松本吉弘', '日向藍子', '伊達朱里紗'])
+    # umeda = MyTeam('UMD', ['佐々木寿人', '竹内元太', '鈴木優'])
+    # daisu1 = MyTeam('ダイス１', ['醍醐大', '鈴木たろう', '小林剛'])
     # daisu2 = MyTeam('ダイス２', ['内川幸太郎', '高宮まり', '本田朋広', '白鳥翔'])
 
+    # 2025 レギュラーシーズン
+    hashimoto = MyTeam('hsmt', ['瑞原明奈', '石井一馬', '白鳥翔', '渋川難波'])
+    rachi = MyTeam('東豚', ['松本吉弘', '堀慎吾', '下石戟', '日向藍子'])
+    umeda = MyTeam('UMD', ['佐々木寿人', '伊達朱里紗', '仲林圭', '鈴木優'])
+    daisu1 = MyTeam('ダイス１', ['逢川恵夢', '園田賢', '内川幸太郎', '浅井堂岐'])
+    daisu2 = MyTeam('ダイス２', ['本田朋広', '茅森早香', '渡辺太', '三浦智博'])
+
     dal = DataAnalysis()
-    dal.make_team_score([hashimoto, rachi, umeda, daisu1])
+    dal.make_team_score([hashimoto, rachi, umeda, daisu1, daisu2])
     #print(dal.player_score_map)
     #print(dal.player_rank_map)
     #print(dal.player_maxmin_map)
