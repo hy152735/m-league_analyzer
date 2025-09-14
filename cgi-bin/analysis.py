@@ -73,10 +73,10 @@ class DataAnalysis:
             #     continue
 
             # セミファイナル仕様 シーズン2024（4月と5月1日だけのデータにする）
-            game_only_day = game_day.split('(')[0].split('/')
-            if int(game_only_day[0]) != 4:
-                if not (int(game_only_day[0]) == 5 and int(game_only_day[1]) == 1):
-                    continue
+            # game_only_day = game_day.split('(')[0].split('/')
+            # if int(game_only_day[0]) != 4:
+            #    if not (int(game_only_day[0]) == 5 and int(game_only_day[1]) == 1):
+            #        continue
 
             game_count += 1
             pre_player_name = '' # 同点対策　前のプレイヤー名
