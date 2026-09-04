@@ -85,11 +85,18 @@ def application(environ, start_response):
         # daisu1 = analysis.MyTeam('ダイス１', ['醍醐大', '鈴木たろう', '小林剛'])
 
         # 2025 レギュラーシーズン
-        hashimoto = analysis.MyTeam('hsmt', ['瑞原明奈', '石井一馬', '白鳥翔', '渋川難波'])
-        rachi = analysis.MyTeam('東豚', ['松本吉弘', '堀慎吾', '下石戟', '日向藍子'])
-        umeda = analysis.MyTeam('UMD', ['佐々木寿人', '伊達朱里紗', '仲林圭', '鈴木優'])
-        daisu1 = analysis.MyTeam('ダイス１', ['逢川恵夢', '園田賢', '内川幸太郎', '浅井堂岐'])
-        daisu2 = analysis.MyTeam('ダイス２', ['本田朋広', '茅森早香', '渡辺太', '三浦智博'])
+        # hashimoto = analysis.MyTeam('hsmt', ['瑞原明奈', '石井一馬', '白鳥翔', '渋川難波'])
+        # rachi = analysis.MyTeam('東豚', ['松本吉弘', '堀慎吾', '下石戟', '日向藍子'])
+        # umeda = analysis.MyTeam('UMD', ['佐々木寿人', '伊達朱里紗', '仲林圭', '鈴木優'])
+        # daisu1 = analysis.MyTeam('ダイス１', ['逢川恵夢', '園田賢', '内川幸太郎', '浅井堂岐'])
+        # daisu2 = analysis.MyTeam('ダイス２', ['本田朋広', '茅森早香', '渡辺太', '三浦智博'])
+
+        # 2026 レギュラーシーズン
+        hashimoto = analysis.MyTeam('hsmt', ['佐々木寿人', '渡辺太', '伊達朱里紗', '石井一馬'])
+        rachi = analysis.MyTeam('東豚', ['下石戟', '多井隆晴', '東城りお', '松本吉弘'])
+        umeda = analysis.MyTeam('UMD', ['永井孝典', '鈴木優', '白鳥翔', '瑞原明奈'])
+        daisu1 = analysis.MyTeam('妖精１', ['茅森早香', '萩原聖人', '竹内元太', '尻無濱航'])
+        daisu2 = analysis.MyTeam('妖精２', ['HIRO柴田', '佐野ひなこ', '朝倉康心', '内川幸太郎'])
 
         #team_list = [hashimoto, rachi, umeda, sasamura, yosei]
         #team_list = [hashimoto, rachi, umeda, sasamura]
