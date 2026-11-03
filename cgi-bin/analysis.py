@@ -30,10 +30,12 @@ class DataAnalysis:
         公式サイトからhtml情報を取得
         """
         #res = requests.get('http://localhost:8000/m_league.html')
-        res = requests.get('https://m-league.jp/', verify=False)
+        #res = requests.get('https://m-league.jp/', verify=False)
+        res = requests.get("https://m-league.jp/api/mleague/data?kind=games", verify=False)
         res.raise_for_status()
         res.encoding = res.apparent_encoding
-        self.soup = BeautifulSoup(res.content, "html.parser")
+        #self.soup = BeautifulSoup(res.content, "html.parser")
+        self.res_games_data = res.json()
 
         self.player_score_map = None
         self.player_rank_map = None
@@ -58,12 +60,19 @@ class DataAnalysis:
         # プレイヤーごとの最高・最低データ（key：player_name、value：配列[max_date, max_tensu, min_date, min_tensu]]）
         player_maxmin_map = {}
 
-        games_result = self.soup.find_all(class_="p-gamesResult")
+        #games_result = self.soup.find_all(class_="p-gamesResult")
+        games_result = self.res_games_data["games"]
         game_count = 0
         for one_day_result in games_result:
-            game_day = one_day_result.find(class_="p-gamesResult__date").text
-            if game_day == '/日(曜日)':
+
+            if not one_day_result["complete"]:
                 continue
+            #game_day = one_day_result.find(class_="p-gamesResult__date").text
+            #game_day = one_day_result["date"]
+            game_day = one_day_result["date"][5:10]
+
+            #if game_day == '/日(曜日)':
+            #    continue
 
             # # セミファイナル仕様（3/16以降まで飛ばす）
             # game_only_day = game_day.split('(')[0].split('/')
@@ -81,28 +90,32 @@ class DataAnalysis:
             game_count += 1
             pre_player_name = '' # 同点対策　前のプレイヤー名
             pre_player_rank = 0 # 同点対策　前の順位
-            result_column = one_day_result.find_all(class_="p-gamesResult__rank-item")
+            #result_column = one_day_result.find_all(class_="p-gamesResult__rank-item")
+            result_column = one_day_result["players"]
             for one_result in result_column:
                 # 名前取得
-                player_name = one_result.find(class_="p-gamesResult__name").text.strip()
+                #player_name = one_result.find(class_="p-gamesResult__name").text.strip()
+                player_name = one_result["name"]
                 # row_score 例: ▲53.3pt
-                row_score = one_result.find(class_="p-gamesResult__point").text.strip()
+                #row_score = one_result.find(class_="p-gamesResult__point").text.strip()
                 # player_score 例：　-53.3
-                player_score = row_score.replace('▲', '-').replace('pt', '')
+                #player_score = row_score.replace('▲', '-').replace('pt', '')
                 # 2022/01/11 チョンボ対応　チョンボの時は65.5(-20)となるので、括弧を外して加算する
-                if ('(' in player_score):
-                    player_score = player_score.replace('(', '').replace(')', '')
-                    # 2024/09/28 チョンボ対応改修　チョンボの時に 5.2 (錯和-20)となるので、間に挟まっている日本語を削除するように改修
-                    player_score = re.sub(r'[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]', "", player_score)
-                    # 65.5-20 = 45.5
-                    player_score = eval(player_score)
-                player_score = float(player_score)
+                #if ('(' in player_score):
+                #    player_score = player_score.replace('(', '').replace(')', '')
+                #    # 2024/09/28 チョンボ対応改修　チョンボの時に 5.2 (錯和-20)となるので、間に挟まっている日本語を削除するように改修
+                #    player_score = re.sub(r'[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]', "", player_score)
+                #    # 65.5-20 = 45.5
+                #    player_score = eval(player_score)
+                #player_score = float(player_score)
+                player_score = float(one_result["point"])
 
                 # score_map作成 小数点の誤差が発生するため、四捨五入を行う
                 sum_score_map[player_name] = round(sum_score_map.get(player_name, 0.0) + player_score, 1)
                       
                 # 順位取得&設定
-                player_rank = eval(one_result.find(class_=re.compile("^p-gamesResult__rank-badge")).text.strip())
+                #player_rank = eval(one_result.find(class_=re.compile("^p-gamesResult__rank-badge")).text.strip())
+                player_rank = int(one_result["rank"])
                 if not player_name in player_rank_map:
                     player_rank_map[player_name] = [0 ,0, 0, 0]
                 # 2024/11/06 同点対策　同点の場合は同じ順位が2つになるので、前の順位と同じだったかどうかを判定する
@@ -287,11 +300,11 @@ if __name__ == '__main__':
     # daisu2 = MyTeam('ダイス２', ['本田朋広', '茅森早香', '渡辺太', '三浦智博'])
 
     # 2026 レギュラーシーズン
-    hashimoto = MyTeam('hsmt', ['佐々木寿人', '渡辺太', '伊達朱里紗', '石井一馬'])
-    rachi = MyTeam('東豚', ['下石戟', '多井隆晴', '東城りお', '松本吉弘'])
-    umeda = MyTeam('UMD', ['永井孝典', '鈴木優', '白鳥翔', '瑞原明奈'])
-    daisu1 = MyTeam('妖精１', ['茅森早香', '萩原聖人', '竹内元太', '尻無濱航'])
-    daisu2 = MyTeam('妖精２', ['HIRO柴田', '佐野ひなこ', '朝倉康心', '内川幸太郎'])
+    hashimoto = MyTeam('hsmt', ['佐々木 寿人', '渡辺 太', '伊達 朱里紗', '石井 一馬'])
+    rachi = MyTeam('東豚', ['下石 戟', '多井 隆晴', '東城 りお', '松本 吉弘'])
+    umeda = MyTeam('UMD', ['永井 孝典', '鈴木 優', '白鳥 翔', '瑞原 明奈'])
+    daisu1 = MyTeam('妖精１', ['茅森 早香', '萩原 聖人', '竹内 元太', '尻無濱 航'])
+    daisu2 = MyTeam('妖精２', ['HIRO 柴田', '佐野 ひなこ', '朝倉 康心', '内川 幸太郎'])
 
     dal = DataAnalysis()
     dal.make_team_score([hashimoto, rachi, umeda, daisu1, daisu2])
@@ -302,7 +315,7 @@ if __name__ == '__main__':
     #print(dal.team_rank_map)
     #print(dal.team_maxmin_map)
 
-    print(hashimoto.soten_score)
-    print(hashimoto.oka_score)
-    print(hashimoto.jyuni_score)
+    #print(hashimoto.soten_score)
+    #print(hashimoto.oka_score)
+    #print(hashimoto.jyuni_score)
 

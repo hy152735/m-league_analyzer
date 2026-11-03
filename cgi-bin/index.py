@@ -92,11 +92,11 @@ def application(environ, start_response):
         # daisu2 = analysis.MyTeam('ダイス２', ['本田朋広', '茅森早香', '渡辺太', '三浦智博'])
 
         # 2026 レギュラーシーズン
-        hashimoto = analysis.MyTeam('hsmt', ['佐々木寿人', '渡辺太', '伊達朱里紗', '石井一馬'])
-        rachi = analysis.MyTeam('東豚', ['下石戟', '多井隆晴', '東城りお', '松本吉弘'])
-        umeda = analysis.MyTeam('UMD', ['永井孝典', '鈴木優', '白鳥翔', '瑞原明奈'])
-        daisu1 = analysis.MyTeam('妖精１', ['茅森早香', '萩原聖人', '竹内元太', '尻無濱航'])
-        daisu2 = analysis.MyTeam('妖精２', ['HIRO柴田', '佐野ひなこ', '朝倉康心', '内川幸太郎'])
+        hashimoto = analysis.MyTeam('hsmt', ['佐々木 寿人', '渡辺 太', '伊達 朱里紗', '石井 一馬'])
+        rachi = analysis.MyTeam('東豚', ['下石 戟', '多井 隆晴', '東城 りお', '松本 吉弘'])
+        umeda = analysis.MyTeam('UMD', ['永井 孝典', '鈴木 優', '白鳥 翔', '瑞原 明奈'])
+        daisu1 = analysis.MyTeam('妖精１', ['茅森 早香', '萩原 聖人', '竹内 元太', '尻無濱 航'])
+        daisu2 = analysis.MyTeam('妖精２', ['HIRO 柴田', '佐野 ひなこ', '朝倉 康心', '内川 幸太郎'])
 
         #team_list = [hashimoto, rachi, umeda, sasamura, yosei]
         #team_list = [hashimoto, rachi, umeda, sasamura]
